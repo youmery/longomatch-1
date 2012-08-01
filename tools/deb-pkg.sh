@@ -36,8 +36,5 @@ rm debian/changelog
 export DEBEMAIL=ylatuya@gmail.com
 echo "Create changelog dch --create --empty -v $PKG_VERSION~$DEB_RELEASE  --package $PKG_NAME --distribution $DIST"
 dch --create -v $PKG_VERSION~$DEB_RELEASE  --package $PKG_NAME --distribution $DIST
-dpkg-buildpackage -S
-cd $BUILD_DIR
-dput ppa:ylatuya/ppa $PKG_NAME\_$PKG_VERSION~$DEB_RELEASE\_source.changes
 
-
+dpkg-buildpackage -B

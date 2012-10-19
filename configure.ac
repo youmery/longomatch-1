@@ -137,6 +137,7 @@ LongoMatch/Makefile
 LongoMatch/esyplay
 LongoMatch/esyplay.desktop.in
 LongoMatch/AssemblyInfo.cs
+EsyPlayImport/Makefile
 
 po/Makefile.in
 ])

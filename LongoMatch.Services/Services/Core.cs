@@ -49,7 +49,7 @@ namespace LongoMatch.Services
 			SetupBaseDir();
 
 			/* Init internationalization support */
-			Catalog.Init(Constants.SOFTWARE_NAME.ToLower(),Config.RelativeToPrefix("share/locale"));
+			Catalog.Init("longomatch",Config.RelativeToPrefix("share/locale"));
 
 			/* Check default folders */
 			CheckDirs();
@@ -155,7 +155,7 @@ namespace LongoMatch.Services
 			string home;
 			
 			Config.baseDirectory = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory,"../");
-			if (!System.IO.Directory.Exists(System.IO.Path.Combine(Config.baseDirectory, "share", Constants.SOFTWARE_NAME))) {
+			if (!System.IO.Directory.Exists(System.IO.Path.Combine(Config.baseDirectory, "share", "longomatch"))) {
 				Config.baseDirectory = System.IO.Path.Combine(Config.baseDirectory, "../");
 			}
 			if (!System.IO.Directory.Exists(System.IO.Path.Combine(Config.baseDirectory, "share", Constants.SOFTWARE_NAME)))

@@ -54,13 +54,11 @@ namespace LongoMatch
 		}
 
 		public static string ImagesDir() {
-			return RelativeToPrefix(String.Format("share/{0}/images",
-						Constants.SOFTWARE_NAME.ToLower()));
+			return RelativeToPrefix(String.Format("share/longomatch/images"));
 		}
 		
 		public static string PluginsDir() {
-			return RelativeToPrefix(String.Format("lib/{0}/plugins",
-						Constants.SOFTWARE_NAME.ToLower()));
+			return RelativeToPrefix(String.Format("lib/longomatch/plugins"));
 		}
 		
 		public static string PluginsConfigDir() {

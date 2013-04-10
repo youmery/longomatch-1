@@ -123,20 +123,22 @@ namespace LongoMatch.Gui
 			guTimeline = new GameUnitsTimelineWidget ();
 			downbox.PackStart(guTimeline, true, true, 0);
 			
+			TagSubcategoriesAction.Active = !Config.FastTagging;
+			
 			playercapturer.Mode = PlayerCapturerBin.PlayerOperationMode.Player;
-			playercapturer.SetLogo(System.IO.Path.Combine(Config.ImagesDir(),"background.png"));
+			playercapturer.SetLogo(System.IO.Path.Combine(Config.ImagesDir,"background.png"));
 			playercapturer.LogoMode = true;
 			playercapturer.Tick += OnTick;
 			playercapturer.Detach += DetachPlayer;
 
-			playercapturer.Logo = System.IO.Path.Combine(Config.ImagesDir(),"background.png");
+			playercapturer.Logo = System.IO.Path.Combine(Config.ImagesDir,"background.png");
 			playercapturer.CaptureFinished += (sender, e) => {CloseCaptureProject();};
 			
 			buttonswidget.Mode = TagMode.Predifined;
 			ConnectSignals();
 			ConnectMenuSignals();
 			
-			if (!Config.useGameUnits)
+			if (!Config.UseGameUnits)
 				GameUnitsViewAction.Visible = false;
 			
 			MenuItem parent = ImportProjectActionMenu;
@@ -336,7 +338,7 @@ namespace LongoMatch.Gui
 				playercapturer.Reparent(box);
 				buttonswidget.Visible = true;
 				timeline.Visible = true;
-				if (Config.useGameUnits) {
+				if (Config.UseGameUnits) {
 					guTimeline.Visible = true;
 					gameunitstaggerwidget1.Visible = true;
 				}
@@ -578,7 +580,7 @@ namespace LongoMatch.Gui
 			timeline.Visible = !action.Active && TimelineViewAction.Active;
 			buttonswidget.Visible = !action.Active &&
 				(TaggingViewAction.Active || ManualTaggingViewAction.Active);
-			if (Config.useGameUnits) {
+			if (Config.UseGameUnits) {
 				guTimeline.Visible = !action.Visible && GameUnitsViewAction.Active;
 				gameunitstaggerwidget1.Visible = !action.Active && (GameUnitsViewAction.Active || 
 					TaggingViewAction.Active || ManualTaggingViewAction.Active);
@@ -598,7 +600,7 @@ namespace LongoMatch.Gui
 			
 			buttonswidget.Visible = action == ManualTaggingViewAction || sender == TaggingViewAction;
 			timeline.Visible = action == TimelineViewAction;
-			if (Config.useGameUnits) {
+			if (Config.UseGameUnits) {
 				guTimeline.Visible = action == GameUnitsViewAction;
 				gameunitstaggerwidget1.Visible = buttonswidget.Visible || guTimeline.Visible;
 			}

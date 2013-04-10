@@ -53,6 +53,9 @@ namespace LongoMatch.Services
 
 			/* Check default folders */
 			CheckDirs();
+			
+			/* Load user config */
+			Config.Load();
 		}
 
 		public static void Start(IGUIToolkit guiToolkit, IMultimediaToolkit multimediaToolkit) {
@@ -70,7 +73,7 @@ namespace LongoMatch.Services
 			Core.mainWindow.TemplatesService = ts;
 
 			/* Start DB services */
-			db = new DataBase(Path.Combine(Config.DBDir, Config.CurrentDatabase));
+			db = new DataBase(Config.DBDir, Config.CurrentDatabase);
 			
 			/* Start the events manager */
 			eManager = new EventsManager(guiToolkit);

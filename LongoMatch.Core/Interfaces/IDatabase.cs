@@ -23,6 +23,8 @@ namespace LongoMatch.Interfaces
 {
 	public interface IDatabase
 	{
+		bool SelectDB (string DBName);
+		
 		List<ProjectDescription> GetAllProjects();
 
 		Project GetProject(Guid id);

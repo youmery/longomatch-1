@@ -61,12 +61,6 @@ namespace LongoMatch.DB
 			this.DBDir = DBDir;
 			this.DBName = DBName;
 			SelectDB (DBName);
-			try {
-				BackupDB();
-			} catch (Exception e) {
-				Log.Error("Error creating databse backup");
-				Log.Exception(e);
-			}
 		}
 		
 		/// <value>
@@ -105,17 +99,28 @@ namespace LongoMatch.DB
 		/// <summary>
 		/// Initialize the Database
 		/// </summary>
-		public void SelectDB(string name) {
+		public bool SelectDB(string name) {
+			bool ret = false;
+			
 			this.currentDB = Path.Combine(DBDir, name);
 			/* Create a new DB if it doesn't exists yet */
-			if(!System.IO.File.Exists(currentDB))
+			if(!System.IO.File.Exists(currentDB)) {
 				CreateNewDB();
+				ret = true;
+			}
 			
 			Log.Information ("Using database file: " + currentDB);
 			
 			GetDBVersion();
 			GetBackupDate();
 			CheckDB();
+			try {
+				BackupDB();
+			} catch (Exception e) {
+				Log.Error("Error creating database backup");
+				Log.Exception(e);
+			}
+			return ret;
 		}
 		
 		/// <summary>
@@ -327,7 +332,7 @@ namespace LongoMatch.DB
 		
 		private void UpdateBackupDate (bool create) {
 			if (create) {
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 				try	{
 					db.Store(lastBackup);
 				} finally {
@@ -385,7 +390,7 @@ namespace LongoMatch.DB
 
 			try {
 				File.Copy(currentDB, backupFilepath);
-				Log.Information ("Created backup for database at ", backupFilename);
+				Log.Information ("Created backup for database at ", backupFilepath);
 				lastBackup = new BackupDate {Date = now};
 				UpdateBackupDate(false);
 			} catch (Exception ex) {

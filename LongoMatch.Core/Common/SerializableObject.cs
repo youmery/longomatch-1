@@ -47,7 +47,7 @@ namespace LongoMatch.Common
 		                           SerializationType type=SerializationType.Binary) {
 			Stream stream = new FileStream(filepath, FileMode.Create, FileAccess.Write, FileShare.None);
 			using (stream) {
-				Save<T> (obj, stream);
+				Save<T> (obj, stream, type);
 				stream.Close();
 			}
 		}

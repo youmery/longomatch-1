@@ -30,11 +30,30 @@ namespace LongoMatch
 		static ConfigState state;
 		
 		public static void Load () {
-			state = ConfigState.Load<ConfigState>(Config.ConfigFile, SerializableObject.SerializationType.Xml);
+			if (File.Exists(Config.ConfigFile)) {
+				Log.Information ("Loading config from " + Config.ConfigFile);
+				try {
+					state = SerializableObject.Load<ConfigState>(Config.ConfigFile, SerializableObject.SerializationType.Xml);
+				} catch (Exception ex) {
+					Log.Error ("Error loading config");
+					Log.Exception (ex);
+				}
+			}
+			
+			if (state == null) {
+				Log.Information ("Creating new config at " + Config.ConfigFile);
+				state = new ConfigState();
+				Save ();
+			}
 		}
 		
 		public static void Save () {
-			ConfigState.Save(state, Config.ConfigFile, SerializableObject.SerializationType.Xml); 
+			try {
+				SerializableObject.Save(state, Config.ConfigFile, SerializableObject.SerializationType.Xml); 
+			} catch (Exception ex) {
+				Log.Error ("Errro saving config");
+				Log.Exception (ex);
+			}
 		}
 		
 		public static string ConfigFile {
@@ -131,17 +150,14 @@ namespace LongoMatch
 				return state.fastTagging;
 			}
 			set {
-				state.fastTagging = true;
+				state.fastTagging = value;
+				Save ();
 			}
 		}
 		
 		public static bool UseGameUnits {
-			get {
-				return state.useGameUnits;
-			}
-			set {
-				state.useGameUnits = value;
-			}
+			get;
+			set;
 		}
 		
 		public static string CurrentDatabase {
@@ -150,17 +166,17 @@ namespace LongoMatch
 			}
 			set {
 				state.currentDatabase = value;
+				Save ();
 			}
 		}
 		#endregion
 
 	}
 	
-	class ConfigState: SerializableObject
-	{
+	[Serializable]
+	public class ConfigState{
 		public bool fastTagging=false;
 		public string currentDatabase=Constants.DEFAULT_DB_FILE;
-		public bool useGameUnits=false;
 	}
 }
 

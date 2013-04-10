@@ -40,21 +40,15 @@ namespace LongoMatch.DB
 	/// </summary>
 	public sealed class DataBase: IDatabase
 	{
-		// File path of the database
-		private string file;
-
-		private Version dbVersion;
+		string currentDB;
+		string DBDir;
+		string DBName;
+		Version dbVersion;
+		BackupDate lastBackup;
+		const int MAYOR=2;
+		const int MINOR=0;
+		TimeSpan maxDaysWithoutBackup = new TimeSpan(5, 0, 0, 0);
 		
-		private BackupDate lastBackup;
-
-		private const int MAYOR=2;
-
-		private const int MINOR=0;
-		
-		private TimeSpan maxDaysWithoutBackup = new TimeSpan(5, 0, 0, 0);
-		
-		private const string backupFilename = Constants.DB_FILE + ".backup";
-
 		
 		/// <summary>
 		/// Creates a proxy for the database
@@ -62,10 +56,11 @@ namespace LongoMatch.DB
 		/// <param name="file">
 		/// A <see cref="System.String"/> with the database file path
 		/// </param>
-		public DataBase(string file)
+		public DataBase(string DBDir, string DBName)
 		{
-			this.file = file;
-			Init();
+			this.DBDir = DBDir;
+			this.DBName = DBName;
+			SelectDB (DBName);
 			try {
 				BackupDB();
 			} catch (Exception e) {
@@ -85,7 +80,7 @@ namespace LongoMatch.DB
 		
 		public void ListObjects() {
 			Dictionary<Type, int> dict = new Dictionary<Type, int>();
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 			
 			IQuery query = db.Query();
 			query.Constrain(typeof(object));
@@ -110,12 +105,13 @@ namespace LongoMatch.DB
 		/// <summary>
 		/// Initialize the Database
 		/// </summary>
-		public void Init() {
+		public void SelectDB(string name) {
+			this.currentDB = Path.Combine(DBDir, name);
 			/* Create a new DB if it doesn't exists yet */
-			if(!System.IO.File.Exists(file))
+			if(!System.IO.File.Exists(currentDB))
 				CreateNewDB();
 			
-			Log.Information ("Using database file: " + file);
+			Log.Information ("Using database file: " + currentDB);
 			
 			GetDBVersion();
 			GetBackupDate();
@@ -133,7 +129,7 @@ namespace LongoMatch.DB
 		/// </returns>
 		public List<ProjectDescription> GetAllProjects() {
 			List<ProjectDescription> list = new List<ProjectDescription>();
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 			
 			Log.Debug("Getting all projects");
 			try	{
@@ -170,7 +166,7 @@ namespace LongoMatch.DB
 		/// </returns>
 		public Project GetProject(Guid id) {
 			Project ret = null;
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 			
 			Log.Debug("Getting project with ID: " + id);
 			try	{
@@ -193,7 +189,7 @@ namespace LongoMatch.DB
 		/// A <see cref="Project"/> to add
 		/// </param>
 		public void AddProject(Project project) {
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 			
 			project.Description.LastModified = DateTime.Now;
 			Log.Debug("Adding new project: " + project);
@@ -217,7 +213,7 @@ namespace LongoMatch.DB
 		/// </param>
 		public void RemoveProject(Guid id) {
 			SetDeleteCascadeOptions();
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 
 			Log.Debug("Removing project with ID: " + id);
 			try	{
@@ -248,7 +244,7 @@ namespace LongoMatch.DB
 		public void UpdateProject(Project project) {
 			// Configure db4o to cascade on delete for each one of the objects stored in a Project
 			SetDeleteCascadeOptions();
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 			
 			project.Description.LastModified = DateTime.Now;
 			Log.Debug("Updating project " + project);
@@ -283,7 +279,7 @@ namespace LongoMatch.DB
 		/// </returns>
 		public bool Exists(Project project) {
 			bool ret;
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 		
 			try {
 				IQuery query = GetQueryProjectById(db, project.UUID);
@@ -300,13 +296,13 @@ namespace LongoMatch.DB
 		
 		private void CreateNewDB () {
 			// Create new DB and add version and last backup date
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 			try {
 				dbVersion= new Version(MAYOR,MINOR);
 				lastBackup = new BackupDate { Date = DateTime.UtcNow};
 				db.Store(dbVersion);
 				db.Store(lastBackup);
-				Log.Information("Created new database:" + file);
+				Log.Information("Created new database:" + currentDB);
 			}
 			finally {
 				db.Close();
@@ -344,7 +340,7 @@ namespace LongoMatch.DB
 		
 		private T GetObject<T>() {
 			T ret = default(T);
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 			try	{
 				IQuery query = db.Query();
 				query.Constrain(typeof(T));
@@ -358,7 +354,7 @@ namespace LongoMatch.DB
 		}
 		
 		private void UpdateObject<T>(this T element) {
-			IObjectContainer db = Db4oFactory.OpenFile(file);
+			IObjectContainer db = Db4oFactory.OpenFile(currentDB);
 			try	{
 				IQuery query = db.Query();
 				query.Constrain(typeof(T));
@@ -383,12 +379,12 @@ namespace LongoMatch.DB
 			if (lastBackup.Date + maxDaysWithoutBackup >= now)
 				return;
 			
-			backupFilepath = Path.Combine(Config.DBDir(), backupFilename);
+			backupFilepath = currentDB + ".backup";
 			if (File.Exists(backupFilepath))
 				File.Delete(backupFilepath);
 
 			try {
-				File.Copy(file, backupFilepath);
+				File.Copy(currentDB, backupFilepath);
 				Log.Information ("Created backup for database at ", backupFilename);
 				lastBackup = new BackupDate {Date = now};
 				UpdateBackupDate(false);

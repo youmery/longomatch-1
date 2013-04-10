@@ -126,7 +126,7 @@ namespace LongoMatch
 		}
 		
 		#region Properties
-		public bool FastTagging {
+		public static bool FastTagging {
 			get {
 				return state.fastTagging;
 			}
@@ -135,7 +135,7 @@ namespace LongoMatch
 			}
 		}
 		
-		public bool UseGameUnits {
+		public static bool UseGameUnits {
 			get {
 				return state.useGameUnits;
 			}
@@ -144,7 +144,7 @@ namespace LongoMatch
 			}
 		}
 		
-		public string CurrentDatabase {
+		public static string CurrentDatabase {
 			get {
 				return state.currentDatabase;
 			}

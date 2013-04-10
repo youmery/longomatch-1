@@ -66,11 +66,11 @@ namespace LongoMatch.Services
 			ProjectsManager projectsManager;
 				
 			/* Start TemplatesService */
-			ts = new TemplatesService(Config.TemplatesDir());
+			ts = new TemplatesService(Config.TemplatesDir);
 			Core.mainWindow.TemplatesService = ts;
 
 			/* Start DB services */
-			db = new DataBase(Path.Combine(Config.DBDir(),Constants.DB_FILE));
+			db = new DataBase(Path.Combine(Config.DBDir, Config.CurrentDatabase));
 			
 			/* Start the events manager */
 			eManager = new EventsManager(guiToolkit);
@@ -103,20 +103,20 @@ namespace LongoMatch.Services
 		}
 
 		public static void CheckDirs() {
-			if(!System.IO.Directory.Exists(Config.HomeDir()))
-				System.IO.Directory.CreateDirectory(Config.HomeDir());
-			if(!System.IO.Directory.Exists(Config.TemplatesDir()))
-				System.IO.Directory.CreateDirectory(Config.TemplatesDir());
-			if(!System.IO.Directory.Exists(Config.SnapshotsDir()))
-				System.IO.Directory.CreateDirectory(Config.SnapshotsDir());
-			if(!System.IO.Directory.Exists(Config.PlayListDir()))
-				System.IO.Directory.CreateDirectory(Config.PlayListDir());
-			if(!System.IO.Directory.Exists(Config.DBDir()))
-				System.IO.Directory.CreateDirectory(Config.DBDir());
-			if(!System.IO.Directory.Exists(Config.VideosDir()))
-				System.IO.Directory.CreateDirectory(Config.VideosDir());
-			if(!System.IO.Directory.Exists(Config.TempVideosDir()))
-				System.IO.Directory.CreateDirectory(Config.TempVideosDir());
+			if(!System.IO.Directory.Exists(Config.HomeDir))
+				System.IO.Directory.CreateDirectory(Config.HomeDir);
+			if(!System.IO.Directory.Exists(Config.TemplatesDir))
+				System.IO.Directory.CreateDirectory(Config.TemplatesDir);
+			if(!System.IO.Directory.Exists(Config.SnapshotsDir))
+				System.IO.Directory.CreateDirectory(Config.SnapshotsDir);
+			if(!System.IO.Directory.Exists(Config.PlayListDir))
+				System.IO.Directory.CreateDirectory(Config.PlayListDir);
+			if(!System.IO.Directory.Exists(Config.DBDir))
+				System.IO.Directory.CreateDirectory(Config.DBDir);
+			if(!System.IO.Directory.Exists(Config.VideosDir))
+				System.IO.Directory.CreateDirectory(Config.VideosDir);
+			if(!System.IO.Directory.Exists(Config.TempVideosDir))
+				System.IO.Directory.CreateDirectory(Config.TempVideosDir);
 		}
 
 		public static DataBase DB {

@@ -25,14 +25,15 @@ using LongoMatch.Common;
 using LongoMatch.Interfaces.GUI;
 using LongoMatch.Interfaces.Multimedia;
 using LongoMatch.Store;
+using LongoMatch.Interfaces;
 
 
 namespace LongoMatch.Services
 {
 	public class Core
 	{
-		static DataBase db;
 		static TemplatesService ts;
+		static DataBaseManager dbManager;
 		static EventsManager eManager;
 		static HotKeysManager hkManager;
 		static GameUnitsManager guManager;
@@ -73,7 +74,8 @@ namespace LongoMatch.Services
 			Core.mainWindow.TemplatesService = ts;
 
 			/* Start DB services */
-			db = new DataBase(Config.DBDir, Config.CurrentDatabase);
+			dbManager = new DataBaseManager (Config.DBDir);
+			dbManager.SetActiveByName (Config.CurrentDatabase);
 			
 			/* Start the events manager */
 			eManager = new EventsManager(guiToolkit);
@@ -122,9 +124,9 @@ namespace LongoMatch.Services
 				System.IO.Directory.CreateDirectory(Config.TempVideosDir);
 		}
 
-		public static DataBase DB {
+		public static IDatabase DB {
 			get {
-				return db;
+				return dbManager.ActiveDB;
 			}
 		}
 		

@@ -176,7 +176,7 @@ namespace LongoMatch
 	[Serializable]
 	public class ConfigState{
 		public bool fastTagging=false;
-		public string currentDatabase=Constants.DEFAULT_DB_FILE;
+		public string currentDatabase=Constants.DEFAULT_DB_NAME;
 	}
 }
 
